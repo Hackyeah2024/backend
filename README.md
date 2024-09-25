@@ -9,7 +9,7 @@ pip install -f requirements.txt
 python3 app.py
 ```
 
-#Video processing request:
+## Video processing request:
 ```
 curl --location 'http://localhost:5000/process_video' \
 --form 'video_file=@"/home/tarjei/Downloads/Video.mp4"'
