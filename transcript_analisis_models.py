@@ -1,15 +1,24 @@
 from typing import List, Optional
+from enum import Enum
 
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel, Field
 
-from llm_models import open_ai_llm_mini
+from llm_models import open_ai_llm_mini, open_ai_llm
 
+
+class SentimentType(str, Enum):
+    VERY_NEGATIVE = "VERY_NEGATIVE"
+    NEGATIVE = "NEGATIVE"
+    NEUTRAL = "NEUTRAL"
+    POSITIVE = "POSITIVE"
+    VERY_POSITIVE = "VERY_POSITIVE"
 
 class OffTopicSegment(BaseModel):
     text: str = Field(..., description="The off-topic or nonsensical segment")
     reason: str = Field(..., description="Explanation why it does not fit the main subject")
+    segment_index: int = Field(..., description="Index of a segment that is associated with off-topic")
 
 
 class QualityMetric(BaseModel):
@@ -18,8 +27,21 @@ class QualityMetric(BaseModel):
 
 
 class Sentiment(BaseModel):
-    overall: str = Field(..., description="Overall sentiment (Positive/Negative/Neutral)")
+    overall: SentimentType = Field(..., description="Overall sentiment ")
     emotions_detected: List[str] = Field(..., description="List of emotions detected")
+
+    class Config:
+        use_enum_values = True
+
+
+class SegmentsCategorization(BaseModel):
+    category: str = Field(..., description="Category for consecutive segments.")
+    from_segment: int = Field(..., description="Starting index of segment where this category matches")
+    to_segments: int = Field(..., description="Ending index of segment where this category matches")
+
+class FactDetail(BaseModel):
+    fact: str = Field(..., description="A short version of a fact")
+    fact_with_more_context: str = Field(..., description="A fact that is self contained with a context and all details, so that later on it can be verified by other llm with internet access")
 
 
 class QualityMetrics(BaseModel):
@@ -33,6 +55,9 @@ class QualityMetrics(BaseModel):
     llm_off_topic_segments: List[OffTopicSegment]
     persuasiveness: QualityMetric
     key_topics: List[str]
+    categorized_segments: List[SegmentsCategorization]
+
+    facts_to_verify: List[FactDetail] = Field(..., description="All information presented as facts that user ought to carefully verify with own research")
 
 
 
@@ -83,7 +108,7 @@ def analyze_segment(segment_transcription: str) -> SegmentAnalysis:
         1. Clarity and Coherence (score out of 10):
         2. Sentiment Analysis (Positive/Negative/Neutral):
         3. Key Topics Discussed (List of topics):
-
+        4. Always return data in language of a transcript.
        Format:
         {format_instructions}
             
@@ -111,7 +136,8 @@ def analyze_segments_comparatively(previous_segment: dict[str, any],
 
     prompt_template = PromptTemplate( template ="""
         You are an expert speech analyst. Compare the following two transcribed speech segments and provide the analysis.
-
+        Always return data in language of a transcript.
+        
         Segment 1:
         \"\"\"
         {previous_text}
@@ -144,3 +170,74 @@ def analyze_segments_comparatively(previous_segment: dict[str, any],
     })
 
     return response
+
+
+def analyze_transcription(segments: List[dict[str, any]]):
+
+    parser = PydanticOutputParser(pydantic_object=QualityMetrics)
+
+    prompt_template = PromptTemplate(
+        input_variables=["transcription"],
+        partial_variables={"format_instructions": parser.get_format_instructions()},
+        template="""
+            You are an expert speech analyst. Analyze the following transcribed speech and provide the analysis.
+            You receive index segments so that you can detect certain aspects of transcript for consecutive segments.
+            Always return data in language of a transcript.
+            
+            1. Clarity and Coherence (score out of 10):
+               - Justification:
+            
+            2. Grammar and Syntax (score out of 10):
+               - Justification:
+            
+            3. Relevance to Main Subject (score out of 10):
+               - Justification:
+            
+            4. Vocabulary Richness (score out of 10):
+               - Justification:
+            
+            5. Sentiment Analysis:
+               - Overall sentiment (Positive/Negative/Neutral):
+               - Emotions detected:
+            
+            6. Use of Filler Words (score out of 10):
+               - List of filler words used:
+            
+            7. Structure and Organization (score out of 10):
+               - Justification:
+            
+            8. Persuasiveness (score out of 10):
+               - Justification:
+            
+            9. Key Topics Discussed:
+               - List of topics:
+            
+            10. Grouped segments categorization:
+               - List of grouped segments by category.:
+               - Group segments together into logically coherent clusters.
+            11. All interesting informations presented as facts that a viewer should verifi:
+               - List all important information presented as facts that can be verified by research:
+
+               
+            Format:
+            {format_instructions}
+            
+            Transcription:
+            \"\"\"
+            {transcription}
+            \"\"\"
+        """
+    )
+    chain = prompt_template | open_ai_llm | parser
+
+    transcription = [f"{index}: {d['text']}" for index, d in enumerate(segments)]
+
+    response = chain.invoke({"transcription": transcription})
+
+    return response
+
+
+class AnalysisResult(BaseModel):
+    main_subject: str
+    off_topic_segments: List[OffTopicSegment]
+    quality_metrics: QualityMetrics

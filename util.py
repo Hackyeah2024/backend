@@ -14,7 +14,7 @@ def extract_main_subject(transcription):
         input_variables=["transcription"],
         template="""
             Analyze the following speech transcript and provide a concise summary of the main subject or topics introduced at the beginning:
-            
+            Always return data in language of a transcript.
             \"\"\"
             {transcription}
             \"\"\"

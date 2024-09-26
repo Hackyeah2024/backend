@@ -1,11 +1,14 @@
 Flask==3.0.3
-openai==0.28.1
+openai==1.49.0
 moviepy==1.0.3
 SpeechRecognition==3.10.4
-langchain==0.3.0
+langchain==0.3.1
 langchain-community==0.3.0
+langchain-groq==0.2.0
+langchain-openai==0.2.1
 pydantic==2.9.2
 numpy==1.26
 scikit-learn==1.5.2
 nltk==3.6.7
 openai-whisper==20231117
+cohere==5.10.0
