@@ -1,7 +1,4 @@
 import os
-
-from flask_cors import CORS
-
 import controller.video
 import controller.ai_test
 # import speech_recognition as sr
@@ -12,7 +9,7 @@ from controller.core import app
 
 nltk.download('punkt')
 
-app.config['CORS_HEADERS'] = 'Content-Type'
+app.config['UPLOAD_FOLDER'] = ('uploads')
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 
