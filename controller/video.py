@@ -62,7 +62,7 @@ def process_video():
     subtitles_matching = compare_subtitles(segments, detected_subtitles)
 
     return jsonify({
-        'transcription': transcription,
+        'transcription': segments,
         'analysis': analysis.dict(),
         "segments_analysis": [segment_analysis.dict() for segment_analysis in segments_analysis],
         "events": [event.dict() for event in events],

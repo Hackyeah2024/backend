@@ -11,7 +11,7 @@ def transcribe(audio_path):
         result = model.transcribe(audio_path, word_timestamps= True)
 
         segments = [
-            {"text": seg["text"], "from": seg["start"], "to": seg["end"]}
+            {"text": seg["text"].strip(), "from": seg["start"], "to": seg["end"]}
             for seg in result["segments"]
         ]
         return result["text"], segments
