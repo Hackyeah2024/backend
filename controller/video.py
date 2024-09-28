@@ -7,7 +7,8 @@ from audio import extract_audio_file, transcribe
 from offtopic import detect_off_topic_using_embeddings
 from transcript_analisis_models import analyze_transcription, analyze_segments_comparatively, EventAnalysis, \
     analyze_segment, AnalysisResult
-from video_ai import video_detect_text
+from video_ai import detect_subtitles
+from compare_subtitles import compare_subtitles
 
 
 @app.route('/process_video', methods=['POST'])
@@ -55,12 +56,13 @@ def process_video():
 
     )
 
-    # Find subtitles
-    video_detect_text(video_path)
+    detected_subtitles = detect_subtitles(video_path)
+    subtitles_matching = compare_subtitles(segments, detected_subtitles)
 
     return jsonify({
         'transcription': transcription,
         'analysis': analysis.dict(),
         "segments_analysis": [segment_analysis.dict() for segment_analysis in segments_analysis],
-        "events": [event.dict() for event in events]
+        "events": [event.dict() for event in events],
+        "subtitles_matching": subtitles_matching.dict()
     })
