@@ -7,6 +7,7 @@ from audio import extract_audio_file, transcribe
 from offtopic import detect_off_topic_using_embeddings
 from transcript_analisis_models import analyze_transcription, analyze_segments_comparatively, EventAnalysis, \
     analyze_segment, AnalysisResult
+from video_ai import video_detect_text
 
 
 @app.route('/process_video', methods=['POST'])
@@ -53,6 +54,9 @@ def process_video():
         quality_metrics=quality_metrics
 
     )
+
+    # Find subtitles
+    video_detect_text(video_path)
 
     return jsonify({
         'transcription': transcription,
