@@ -12,3 +12,7 @@ scikit-learn==1.5.2
 nltk==3.6.7
 openai-whisper==20231117
 cohere==5.10.0
+google-api-core==2.20.0
+google-api-python-client==2.147.0
+google-cloud==0.34.0
+google-cloud-videointelligence==2.13.5
