@@ -15,6 +15,29 @@ class SentimentType(str, Enum):
     POSITIVE = "POSITIVE"
     VERY_POSITIVE = "VERY_POSITIVE"
 
+class IssueDetected(str, Enum):
+    INTERLUDE = "INTERLUDE"
+    SPEAKING_TOO_FAST = "SPEAKING_TOO_FAST"
+    REPETITION = "REPETITION"
+    CHANGE_THE_TOPIC_OF_SPEECH = "CHANGE_THE_TOPIC_OF_SPEECH"
+    TOO_MANY_NUMBERS = "TOO_MANY_NUMBERS"
+    TOO_LONG_DIFFICULT_WORDS_OR_SENTENCES = "TOO_LONG_DIFFICULT_WORDS_OR_SENTENCES"
+    JARGON = "JARGON"
+    FORREIGN_LANGUAGE = "FORREIGN_LANGUAGE"
+    PAUSING_TOO_LONG = "PAUSING_TOO_LONG"
+    SPEAKING_LAUDER = "SPEAKING_LAUDER"
+    SPEAKING_TOO_QUIET_IN_WHISPER = "SPEAKING_TOO_QUIET_IN_WHISPER"
+    SECOND_PLAN_ANOTHER_PERSON_ON_THE_SET = "SECOND_PLAN_ANOTHER_PERSON_ON_THE_SET"
+    TURNING_AWAY_TWISTING_OR_GESTICULATING = "TURNING_AWAY_TWISTING_OR_GESTICULATING"
+    FACIAL_EXPRESSIONS = "FACIAL_EXPRESSIONS"
+    FALSE_OR_NON_EXISTING_WORDS = "FALSE_OR_NON_EXISTING_WORDS"
+    INCONSISTENT_SPEECH = "INCONSISTENT_SPEECH"
+    NOISE = "NOISE"
+    USE_OF_THE_PASSIVE_SIDE = "USE_OF_THE_PASSIVE_SIDE"
+    ACCENTUATION = "ACCENTUATION"
+    USED_FORREIGN_LANGUAGE_PHRASES_OTHER_THAN_POLISH = "USED_FORREIGN_LANGUAGE_PHRASES_OTHER_THAN_POLISH"
+
+
 class OffTopicSegment(BaseModel):
     text: str = Field(..., description="The off-topic or nonsensical segment")
     reason: str = Field(..., description="Explanation why it does not fit the main subject")
@@ -43,12 +66,27 @@ class FactDetail(BaseModel):
     fact: str = Field(..., description="A short version of a fact")
     fact_with_more_context: str = Field(..., description="A fact that is self contained with a context and all details, so that later on it can be verified by other llm with internet access")
 
+class TargetGroupPercentage(BaseModel):
+    AGE_GROUP_13_18: float
+    AGE_GROUP_19_24: float
+    AGE_GROUP_25_34: float
+    AGE_GROUP_35_44: float
+    AGE_GROUP_45_54: float
+    AGE_GROUP_55_64: float
+    AGE_GROUP_65_PLUS: float
+
+
 
 class QualityMetrics(BaseModel):
     clarity_coherence: QualityMetric
+    gunning_fog_index: int = Field(..., description="Calculate gunning fog index for while transcript")
     grammar_syntax: QualityMetric
     relevance_to_subject: QualityMetric
     vocabulary_richness: QualityMetric
+    structure_conserved_score: QualityMetric = Field(..., description="ocenić strukturę wypowiedzi - czy był zachowany wstęp, rozwinięcie i zakończenie")
+
+    age_target_groups: TargetGroupPercentage = Field(..., description="Assign accuracy for which age group this video is targeted. It is probability distributiom, make sure that sum of individual scores will sum to 1")
+
     sentiment: Sentiment
     filler_words_usage: QualityMetric
     structure_organization: QualityMetric
@@ -56,6 +94,8 @@ class QualityMetrics(BaseModel):
     persuasiveness: QualityMetric
     key_topics: List[str]
     categorized_segments: List[SegmentsCategorization]
+    issues_detected: List[List[IssueDetected]] = Field(..., description="List of issues detected for each segment.. Take into account that some issues are between more than one segment.There might be one than  issue type in a segment. Its a Inner list is list of issues in segment outer list is list for corresponding segment")
+
 
     facts_to_verify: List[FactDetail] = Field(..., description="All information presented as facts that user ought to carefully verify with own research")
 
@@ -63,7 +103,8 @@ class QualityMetrics(BaseModel):
 
 
 class SegmentAnalysis(BaseModel):
-    clarity_coherence: int = Field(..., description="Score out of 10")
+    clarity: int = Field(..., description="Score out of 10")
+    coherence: int = Field(..., description="Score out of 10")
     sentiment: str = Field(..., description="Sentiment: Positive/Negative/Neutral")
     key_topics: List[str] = Field(..., description="List of key topics discussed")
 
@@ -116,11 +157,11 @@ def analyze_segment(segment_transcription: str) -> SegmentAnalysis:
 
     prompt_template = PromptTemplate( template = """
         You are an expert speech analyst. Analyze the following transcribed speech segment and provide the analysis.
-
+        
         1. Clarity and Coherence (score out of 10):
         2. Sentiment Analysis (Positive/Negative/Neutral):
         3. Key Topics Discussed (List of topics):
-        4. Always return data in language of a transcript.
+        4. Always return data in Polish language
        Format:
         {format_instructions}
             
@@ -148,7 +189,7 @@ def analyze_segments_comparatively(previous_segment: dict[str, any],
 
     prompt_template = PromptTemplate( template ="""
         You are an expert speech analyst. Compare the following two transcribed speech segments and provide the analysis.
-        Always return data in language of a transcript.
+        Always return data in return data in Polish language.
         
         Segment 1:
         \"\"\"
@@ -194,7 +235,29 @@ def analyze_transcription(segments: List[dict[str, any]]):
         template="""
             You are an expert speech analyst. Analyze the following transcribed speech and provide the analysis.
             You receive index segments so that you can detect certain aspects of transcript for consecutive segments.
-            Always return data in language of a transcript.
+            Always return transcription as is, all justifications and metadata inference should be in Polish.
+            
+            Transcripts might contain following issues:
+            3. Applied modifications (errors) :
+                a) interludes
+                b) speaking too fast
+                c) repetitions
+                d) changing the topic of speech
+                e) too many numbers
+                f) too long, difficult words, sentences
+                g) jargon
+                h) foreign language - return appropriate issue with a segment when you detect foreign language usage other than polish
+                i) pausing too long
+                j) speaking louder
+                k) speaking too quietly, in a whisper
+                l) second plan - another person on the set
+                m) turning away, twisting, gesticulating
+                n) facial expressions
+                o) false words
+                p) inconsistent speech with the transcript
+                q) noise
+                r) use of the passive side, e.g. given, indicated, summarized
+                s) accentuation
             
             1. Clarity and Coherence (score out of 10):
                - Justification:

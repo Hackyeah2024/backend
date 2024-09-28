@@ -12,6 +12,11 @@ from video_ai import detect_subtitles
 from compare_subtitles import compare_subtitles
 
 
+@app.route('/', methods=['GET'])
+def health_check():
+    # You can add any logic here to verify your app's health
+    return jsonify(status="healthy"), 200
+
 @app.route('/process_video', methods=['POST'])
 @cross_origin()
 def process_video():

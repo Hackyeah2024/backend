@@ -20,7 +20,7 @@ def transcribe(audio_path):
         print(f"An error occurred during transcription: {e}")
         transcription = "An error occurred during transcription."
 
-    return transcription
+    return transcription, []
 
 
 def extract_audio_file(audio_path, video_path):
