@@ -11,7 +11,8 @@ def compare_subtitles(transcription, ocr):
     parser = PydanticOutputParser(pydantic_object=SubtitlesAnalysis)
 
     prompt_template = PromptTemplate(template="""
-            Rate similarity between two versions of subtitles for video between 0% and 100%:
+            Rate similarity between two versions of subtitles for video between 0% and 100%.
+            Ignore minor changes like mismatch between single letters.
             Transcription subtitles:\n{transcription_subtitles}\n
             OCR subtitles:\n{ocr_subtitles}\n
             Format:\n{format_instructions}
