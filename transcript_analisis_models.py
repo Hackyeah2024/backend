@@ -160,6 +160,16 @@ class Questions(BaseModel):
             }
         }
 
+class Summary(BaseModel):
+    summary: str = Field(..., description="Quick summary of the text")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "summary": "Text is about xyz"
+            }
+        }
+
 
 # Function to analyze a single segment independently
 def analyze_segment(segment_transcription: str) -> SegmentAnalysis:

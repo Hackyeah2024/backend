@@ -7,6 +7,7 @@ from ask_questions import ask_questions
 from controller.core import app
 from audio import extract_audio_file, transcribe
 from offtopic import detect_off_topic_using_embeddings
+from summary import write_summary
 from transcript_analisis_models import analyze_transcription, analyze_segments_comparatively, EventAnalysis, \
     analyze_segment, AnalysisResult
 from video_ai import detect_subtitles
@@ -66,8 +67,8 @@ def process_video():
 
     detected_subtitles = detect_subtitles(video_path)
     subtitles_matching = compare_subtitles(segments, detected_subtitles)
-
     questions = ask_questions(transcription)
+    summary = write_summary(transcription)
 
     return jsonify({
         'transcription': segments,
@@ -75,5 +76,6 @@ def process_video():
         "segments_analysis": [segment_analysis.dict() for segment_analysis in segments_analysis],
         "events": [event.dict() for event in events],
         "subtitles_matching": subtitles_matching.dict(),
-        "questions": questions.dict()["questions"]
+        "questions": questions.dict()["questions"],
+        "summary": summary.dict()["summary"]
     })
