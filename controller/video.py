@@ -3,6 +3,7 @@ import os
 from flask import request, jsonify
 from flask_cors import cross_origin
 
+from ask_questions import ask_questions
 from controller.core import app
 from audio import extract_audio_file, transcribe
 from offtopic import detect_off_topic_using_embeddings
@@ -66,10 +67,13 @@ def process_video():
     detected_subtitles = detect_subtitles(video_path)
     subtitles_matching = compare_subtitles(segments, detected_subtitles)
 
+    questions = ask_questions(transcription)
+
     return jsonify({
         'transcription': segments,
         'analysis': analysis.dict(),
         "segments_analysis": [segment_analysis.dict() for segment_analysis in segments_analysis],
         "events": [event.dict() for event in events],
-        "subtitles_matching": subtitles_matching.dict()
+        "subtitles_matching": subtitles_matching.dict(),
+        "questions": questions.dict()["questions"]
     })

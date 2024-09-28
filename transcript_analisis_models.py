@@ -150,6 +150,16 @@ class SubtitlesAnalysis(BaseModel):
             }
         }
 
+class Questions(BaseModel):
+    questions: List[str] = Field(..., description="List of questions for text")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "questions": ["Who is speaking?", "What is the main topic?"]
+            }
+        }
+
 
 # Function to analyze a single segment independently
 def analyze_segment(segment_transcription: str) -> SegmentAnalysis:
