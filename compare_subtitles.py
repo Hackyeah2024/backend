@@ -2,18 +2,18 @@ from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 
 from llm_models import open_ai_llm_mini
-from transcript_analisis_models import SegmentAnalysis
+from transcript_analisis_models import SubtitlesAnalysis
 
 
 def compare_subtitles(transcription, ocr):
     ocr_subtitles = " ".join(sentence["text"] for sentence in ocr)
 
-    parser = PydanticOutputParser(pydantic_object=SegmentAnalysis)
+    parser = PydanticOutputParser(pydantic_object=SubtitlesAnalysis)
 
     prompt_template = PromptTemplate(template="""
             Rate similarity between two versions of subtitles for video between 0% and 100%:
-            Subtitles A:\n{transcription_subtitles}\n
-            Subtitles B:\n{ocr_subtitles}\n
+            Transcription subtitles:\n{transcription_subtitles}\n
+            OCR subtitles:\n{ocr_subtitles}\n
             Format:\n{format_instructions}
         """,
         input_variables=["transcription_subtitles", "ocr_subtitles"],

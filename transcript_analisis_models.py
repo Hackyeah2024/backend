@@ -97,6 +97,18 @@ class EventAnalysis(BaseModel):
     to_segment: int
     event_analysis: ComparativeAnalysis
 
+class SubtitlesAnalysis(BaseModel):
+    subtitles_similarity: int = Field(..., description="Score in %")
+    changes: List[str] = Field(..., description="List of changes between both subtitles")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "subtitles_similarity": 80,
+                "changes": ["'zmarzanej kontroli' instead of 'zamierzonej kontroli'"]
+            }
+        }
+
 
 # Function to analyze a single segment independently
 def analyze_segment(segment_transcription: str) -> SegmentAnalysis:

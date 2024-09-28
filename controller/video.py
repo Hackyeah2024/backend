@@ -1,6 +1,7 @@
 import os
 
 from flask import request, jsonify
+from flask_cors import cross_origin
 
 from controller.core import app
 from audio import extract_audio_file, transcribe
@@ -12,6 +13,7 @@ from compare_subtitles import compare_subtitles
 
 
 @app.route('/process_video', methods=['POST'])
+@cross_origin()
 def process_video():
     if 'video_file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
