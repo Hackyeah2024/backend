@@ -6,12 +6,12 @@ def detect_emotions(video_path):
     client = vision.ImageAnnotatorClient()
 
     vidcap = cv2.VideoCapture(video_path)
-    frame_rate = vidcap.get(cv2.CAP_PROP_FPS)
-    while vidcap.isOpened():
-        frame_id = vidcap.get(1)  # current frame number
-        ret, frame = vidcap.read()
-        if not ret:
-            break
+    # frame_rate = vidcap.get(cv2.CAP_PROP_FPS)
+    # while vidcap.isOpened():
+    #     frame_id = vidcap.get(1)  # current frame number
+    #     ret, frame = vidcap.read()
+    #     if not ret:
+    #         break
 
         # if frame_id % math.floor(frame_rate) == 0:
         #     print("Processing frame {frame_id}".format(frame_id=frame_id))
@@ -33,6 +33,6 @@ def detect_emotions(video_path):
 
         #     path = os.path.abspath("frames/frame%d.jpg" % int(frameId))
         #     cv2.imwrite(path, frame)
+    duration = vidcap.get(cv2.CAP_PROP_POS_MSEC)
     vidcap.release()
-
-    return None, vidcap.get(cv2.CAP_PROP_POS_MSEC)
+    return None, duration
