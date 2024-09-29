@@ -7,7 +7,7 @@ pip install -f requirements.txt
 ## Adding environment variables
 You have to set the environmental variables with path to Google Cloud config file and with tokens for OpenAI and Cohere.
 ```
-export GOOGLE_APPLICATION_CREDENTIALS="/Users/user/PycharmProjects/backend/google_keys.json"
+export GOOGLE_APPLICATION_CREDENTIALS="/Users/user/projects/backend/google_keys.json"
 export OPENAI_API_KEY=open-api-key
 export COHERE_API_KEY=cohere-api-key
 ```
