@@ -20,6 +20,12 @@ def health_check():
     # You can add any logic here to verify your app's health
     return jsonify(status="healthy"), 200
 
+@app.route('/', methods=['POST'])
+@cross_origin()
+def health_check_POST():
+    # You can add any logic here to verify your app's health
+    return jsonify(status="healthy"), 200
+
 @app.route('/process_video', methods=['POST'])
 @cross_origin()
 def process_video():
@@ -78,6 +84,6 @@ def process_video():
         "events": [event.dict() for event in events],
         "subtitles_matching": subtitles_matching.dict(),
         "questions": questions.dict()["questions"],
-        "summary": summary.dict()["summary"]
+        "summary": summary.dict()["summary"],
         "person_annotations": person_annotations
     })
