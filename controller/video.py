@@ -10,7 +10,7 @@ from offtopic import detect_off_topic_using_embeddings
 from summary import write_summary
 from transcript_analysis_models import analyze_transcription, analyze_segments_comparatively, EventAnalysis, \
     analyze_segment, AnalysisResult
-from video_ai import detect_subtitles
+from video_ai import analyze_video
 from compare_subtitles import compare_subtitles
 
 
@@ -75,7 +75,7 @@ def process_video():
 
     )
 
-    detected_subtitles, bounding_boxes = detect_subtitles(video_path)
+    detected_subtitles, bounding_boxes = analyze_video(video_path)
     subtitles_matching = compare_subtitles(segments, detected_subtitles)
     questions = ask_questions(transcription)
     summary = write_summary(transcription)

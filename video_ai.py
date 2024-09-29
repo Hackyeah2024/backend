@@ -1,11 +1,10 @@
 import io
-from contextlib import redirect_stdout
 
 from google.cloud import videointelligence
 
 
 
-def detect_subtitles(path):
+def analyze_video(path):
     # Initialize the Video Intelligence client
     video_client = videointelligence.VideoIntelligenceServiceClient()
 
@@ -70,11 +69,8 @@ def detect_subtitles(path):
     # Sort the detected subtitles
     sorted_subtitles = sorted(sorted(subtitles, key=lambda d: d["text_box"].split(",")[1]), key=lambda d: d['start_time'])
 
-    # # Process the person detection annotations
+    # Process the person detection annotations
     bounding_boxes = []
-    with open('out.txt', 'w') as f:
-        with redirect_stdout(f):
-            print(annotation_result.person_detection_annotations)
     for person_annotation in annotation_result.person_detection_annotations:
         for track in person_annotation.tracks:
             for timestamped_object in track.timestamped_objects:
