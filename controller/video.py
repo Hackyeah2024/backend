@@ -1,6 +1,6 @@
 import os
 
-from flask import request, jsonify
+from flask import request, jsonify, send_from_directory
 from flask_cors import cross_origin
 
 from ask_questions import ask_questions
@@ -23,6 +23,11 @@ def health_check():
 def health_check_POST():
     # You can add any logic here to verify your app's health
     return jsonify(status="healthy"), 200
+
+@app.route('/get_video/<filename>', methods=['GET'])
+def get_video(filename):
+    path = os.path.abspath(app.config['UPLOAD_FOLDER'])
+    return send_from_directory(path, filename)
 
 @app.route('/process_video', methods=['POST'])
 @cross_origin()
@@ -83,5 +88,6 @@ def process_video():
         "subtitles_matching": subtitles_matching.dict(),
         "questions": questions.dict()["questions"],
         "summary": summary.dict()["summary"],
-        "detected_persons": bounding_boxes
+        "detected_persons": bounding_boxes,
+        "video_url": "/get_video/{filename}".format(filename=file.filename)
     })
