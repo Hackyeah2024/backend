@@ -41,7 +41,7 @@ def process_video():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    file_id = file.filename # str(uuid.uuid4()) + ".mp4"
+    file_id = str(uuid.uuid4()) + ".mp4"
 
     video_path = os.path.join(app.config['UPLOAD_FOLDER'], file_id)
     file.save(video_path)
@@ -80,7 +80,7 @@ def process_video():
 
     detected_subtitles, bounding_boxes = analyze_video(video_path)
     subtitles_matching = compare_subtitles(segments, detected_subtitles)
-    # emotions, duration = detect_emotions(video_path)
+    emotions, duration = detect_emotions(video_path)
     questions = ask_questions(transcription)
     summary = write_summary(transcription)
 
@@ -88,7 +88,7 @@ def process_video():
         'file_id': file_id,
         'name': file.filename,
         'creation_time': datetime.datetime.now(),
-        # 'duration': duration,
+        'duration': duration,
         'transcription': segments,
         'analysis': analysis.dict(),
         "segments_analysis": [segment_analysis.dict() for segment_analysis in segments_analysis],
