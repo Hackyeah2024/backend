@@ -2,7 +2,7 @@ from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 
 from llm_models import open_ai_llm_mini
-from transcript_analisis_models import Summary
+from transcript_analysis_models import Summary
 
 
 def write_summary(text):

@@ -23,9 +23,9 @@ class IssueDetected(str, Enum):
     TOO_MANY_NUMBERS = "TOO_MANY_NUMBERS"
     TOO_LONG_DIFFICULT_WORDS_OR_SENTENCES = "TOO_LONG_DIFFICULT_WORDS_OR_SENTENCES"
     JARGON = "JARGON"
-    FORREIGN_LANGUAGE = "FORREIGN_LANGUAGE"
+    FOREIGN_LANGUAGE = "FOREIGN_LANGUAGE"
     PAUSING_TOO_LONG = "PAUSING_TOO_LONG"
-    SPEAKING_LAUDER = "SPEAKING_LAUDER"
+    SPEAKING_LOUDER = "SPEAKING_LOUDER"
     SPEAKING_TOO_QUIET_IN_WHISPER = "SPEAKING_TOO_QUIET_IN_WHISPER"
     SECOND_PLAN_ANOTHER_PERSON_ON_THE_SET = "SECOND_PLAN_ANOTHER_PERSON_ON_THE_SET"
     TURNING_AWAY_TWISTING_OR_GESTICULATING = "TURNING_AWAY_TWISTING_OR_GESTICULATING"
@@ -35,7 +35,7 @@ class IssueDetected(str, Enum):
     NOISE = "NOISE"
     USE_OF_THE_PASSIVE_SIDE = "USE_OF_THE_PASSIVE_SIDE"
     ACCENTUATION = "ACCENTUATION"
-    USED_FORREIGN_LANGUAGE_PHRASES_OTHER_THAN_POLISH = "USED_FORREIGN_LANGUAGE_PHRASES_OTHER_THAN_POLISH"
+    USED_FOREIGN_LANGUAGE_PHRASES_OTHER_THAN_POLISH = "USED_FOREIGN_LANGUAGE_PHRASES_OTHER_THAN_POLISH"
 
 
 class OffTopicSegment(BaseModel):
@@ -256,6 +256,7 @@ def analyze_transcription(segments: List[dict[str, any]]):
             You are an expert speech analyst. Analyze the following transcribed speech and provide the analysis.
             You receive index segments so that you can detect certain aspects of transcript for consecutive segments.
             Always return transcription as is, all justifications and metadata inference should be in Polish.
+            Transcriptions should be in Polish. Pay special attention to it and write all of the usages of other languages.
             
             Transcripts might contain following issues:
             3. Applied modifications (errors) :
@@ -310,7 +311,7 @@ def analyze_transcription(segments: List[dict[str, any]]):
             10. Grouped segments categorization:
                - List of grouped segments by category.:
                - Group segments together into logically coherent clusters.
-            11. All interesting informations presented as facts that a viewer should verifi:
+            11. All interesting information presented as facts that a viewer should verify:
                - List all important information presented as facts that can be verified by research:
 
                

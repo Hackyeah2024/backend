@@ -6,7 +6,7 @@ from audio import extract_audio_file, transcribe
 from controller.core import app
 from flask import Blueprint, request, jsonify
 
-from transcript_analisis_models import analyze_segments_comparatively, analyze_segment, analyze_transcription, \
+from transcript_analysis_models import analyze_segments_comparatively, analyze_segment, analyze_transcription, \
     FactDetail
 from fact_check_models import verify_facts
 from util import segment_transcript

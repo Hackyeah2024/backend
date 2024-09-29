@@ -1,6 +1,6 @@
 from sklearn.metrics.pairwise import cosine_similarity
 
-from transcript_analisis_models import OffTopicSegment
+from transcript_analysis_models import OffTopicSegment
 from util import segment_transcript, extract_main_subject
 from embeddings import get_embeddings
 

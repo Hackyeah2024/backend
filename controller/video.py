@@ -8,7 +8,7 @@ from controller.core import app
 from audio import extract_audio_file, transcribe
 from offtopic import detect_off_topic_using_embeddings
 from summary import write_summary
-from transcript_analisis_models import analyze_transcription, analyze_segments_comparatively, EventAnalysis, \
+from transcript_analysis_models import analyze_transcription, analyze_segments_comparatively, EventAnalysis, \
     analyze_segment, AnalysisResult
 from video_ai import detect_subtitles
 from compare_subtitles import compare_subtitles
