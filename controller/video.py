@@ -1,4 +1,4 @@
-import os
+import os, uuid, datetime
 
 from flask import request, jsonify, send_from_directory
 from flask_cors import cross_origin
@@ -6,6 +6,7 @@ from flask_cors import cross_origin
 from ask_questions import ask_questions
 from controller.core import app
 from audio import extract_audio_file, transcribe
+from emotions import detect_emotions
 from offtopic import detect_off_topic_using_embeddings
 from summary import write_summary
 from transcript_analysis_models import analyze_transcription, analyze_segments_comparatively, EventAnalysis, \
@@ -40,7 +41,9 @@ def process_video():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    video_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file_id = str(uuid.uuid4())
+
+    video_path = os.path.join(app.config['UPLOAD_FOLDER'], file_id + ".mp4")
     file.save(video_path)
 
     audio_path = os.path.splitext(video_path)[0] + '.wav'
@@ -77,17 +80,23 @@ def process_video():
 
     detected_subtitles, bounding_boxes = analyze_video(video_path)
     subtitles_matching = compare_subtitles(segments, detected_subtitles)
+    emotions, duration = detect_emotions(video_path)
     questions = ask_questions(transcription)
     summary = write_summary(transcription)
 
     return jsonify({
+        'file_id': file_id,
+        'name': file.filename,
+        'creation_time': datetime.datetime.now(),
+        'duration': duration,
         'transcription': segments,
         'analysis': analysis.dict(),
         "segments_analysis": [segment_analysis.dict() for segment_analysis in segments_analysis],
         "events": [event.dict() for event in events],
         "subtitles_matching": subtitles_matching.dict(),
+        "emotions": emotions,
         "questions": questions.dict()["questions"],
         "summary": summary.dict()["summary"],
         "detected_persons": bounding_boxes,
-        "video_url": "/get_video/{filename}".format(filename=file.filename)
+        "video_url": "/get_video/{filename}".format(filename=file_id + ".mp4")
     })

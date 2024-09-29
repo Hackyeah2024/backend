@@ -9,7 +9,7 @@ def ask_questions(text):
     parser = PydanticOutputParser(pydantic_object=Questions)
 
     prompt_template = PromptTemplate(template="""
-            Ask 10 questions for following text:
+            Ask 10 questions in Polish language for following text:
             {text}
             Format:\n{format_instructions}
         """,
