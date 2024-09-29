@@ -1,4 +1,6 @@
 import io
+from contextlib import redirect_stdout
+
 from google.cloud import videointelligence
 
 
@@ -69,33 +71,22 @@ def detect_subtitles(path):
     sorted_subtitles = sorted(sorted(subtitles, key=lambda d: d["text_box"].split(",")[1]), key=lambda d: d['start_time'])
 
     # # Process the person detection annotations
-    person_annotations = []
-    # for person_annotation in annotation_result.person_detection_annotations:
-    #     for track in person_annotation.tracks:
-    #         for timestamped_object in track.timestamped_objects:
-    #             bounding_box = {
-    #                 "time_offset": timestamped_object.time_offset.seconds + timestamped_object.time_offset.microseconds * 1e-6,
-    #                 "left": timestamped_object.normalized_bounding_box.left,
-    #                 "top": timestamped_object.normalized_bounding_box.top,
-    #                 "right": timestamped_object.normalized_bounding_box.right,
-    #                 "bottom": timestamped_object.normalized_bounding_box.bottom,
-    #             }
-    #
-    #             person_info = {
-    #                 "start_time": track.segment.start_time_offset.seconds + track.segment.start_time_offset.microseconds * 1e-6,
-    #                 "end_time": track.segment.end_time_offset.seconds + track.segment.end_time_offset.microseconds * 1e-6,
-    #                 "confidence": track.confidence,
-    #                 "attributes": [
-    #                     {
-    #                         "name": attribute.name,
-    #                         "value": attribute.value,
-    #                         "confidence": attribute.confidence
-    #                     } for attribute in track.attributes
-    #                 ],
-    #                 "bounding_box": bounding_box
-    #             }
-    #             person_annotations.append(person_info)
-    #
+    bounding_boxes = []
+    with open('out.txt', 'w') as f:
+        with redirect_stdout(f):
+            print(annotation_result.person_detection_annotations)
+    for person_annotation in annotation_result.person_detection_annotations:
+        for track in person_annotation.tracks:
+            for timestamped_object in track.timestamped_objects:
+                bounding_box = {
+                    "time_offset": timestamped_object.time_offset.seconds + timestamped_object.time_offset.microseconds * 1e-6,
+                    "left": timestamped_object.normalized_bounding_box.left,
+                    "top": timestamped_object.normalized_bounding_box.top,
+                    "right": timestamped_object.normalized_bounding_box.right,
+                    "bottom": timestamped_object.normalized_bounding_box.bottom,
+                }
+                bounding_boxes.append(bounding_box)
+
 
     # Return the results of both text detection and person detection
-    return sorted_subtitles, person_annotations
+    return sorted_subtitles, bounding_boxes

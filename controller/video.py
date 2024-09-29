@@ -70,7 +70,7 @@ def process_video():
 
     )
 
-    detected_subtitles, person_annotations = detect_subtitles(video_path)
+    detected_subtitles, bounding_boxes = detect_subtitles(video_path)
     subtitles_matching = compare_subtitles(segments, detected_subtitles)
     questions = ask_questions(transcription)
     summary = write_summary(transcription)
@@ -83,5 +83,5 @@ def process_video():
         "subtitles_matching": subtitles_matching.dict(),
         "questions": questions.dict()["questions"],
         "summary": summary.dict()["summary"],
-        "person_annotations": person_annotations
+        "detected_persons": bounding_boxes
     })
