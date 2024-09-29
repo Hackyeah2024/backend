@@ -15,13 +15,11 @@ from compare_subtitles import compare_subtitles
 
 
 @app.route('/', methods=['GET'])
-@cross_origin()
 def health_check():
     # You can add any logic here to verify your app's health
     return jsonify(status="healthy"), 200
 
 @app.route('/', methods=['POST'])
-@cross_origin()
 def health_check_POST():
     # You can add any logic here to verify your app's health
     return jsonify(status="healthy"), 200
